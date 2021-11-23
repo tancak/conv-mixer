@@ -4,6 +4,6 @@ def accuracy(model, test_loader, loss_function, device):
         inputs, labels = data[0].to(device), data[1].to(device)
         outputs = model(inputs)
         loss = loss_function(outputs,labels)
-        test_loss.append(loss.item() * inputs.size(0))
+        test_loss.append(loss.item())
         
     return sum(test_loss)/len(test_loss)

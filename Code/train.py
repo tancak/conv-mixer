@@ -43,7 +43,7 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
                 
         net.eval()
         test_loss = accuracy(net, test_loader, loss_function, DEVICE)
-        print('Epoch {0} \t\t Training Loss: {1} \t\t Test Loss:{2}'.format(epoch + 1, running_loss / 100, test_loss))
+        print('\x1b[1K\rEpoch {0} \t\t Training Loss: {1} \t\t Test Loss:{2}'.format(epoch + 1, running_loss / 100, test_loss))
         
 
 if __name__ == '__main__':
