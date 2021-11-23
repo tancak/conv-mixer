@@ -35,15 +35,15 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
             optimizer.step()
     
             running_loss += loss.item()
-            if i % 100 == 99:
+            if i % 20 == 19:
                 print('Epoch {0}: [{1}/{2}] Training Loss: {3:0.3f}'.format(epoch + 1,
                         (i + 1) * BATCH_SIZE, len(train_loader) * BATCH_SIZE,
-                        running_loss / 100), end='\r')
+                        running_loss / 20), end='\r')
                 running_loss = 0.0
                 
         net.eval()
         test_loss = accuracy(net, test_loader, loss_function, DEVICE)
-        print('Epoch {0}          Training Loss: {1}          Test Loss:{2}'.format(epoch + 1, running_loss / 100, test_loss))
+        print('Epoch {0}          Training Loss: {1:0.3f}          Test Loss:{2:0.3f}'.format(epoch + 1, running_loss / 100, test_loss))
         
 
 if __name__ == '__main__':
@@ -59,7 +59,7 @@ if __name__ == '__main__':
                                      LOG_DIR))
     print("Generating model and optimizer")
     
-    net = ConvMixer(10).to(DEVICE)
+    net = ConvMixer(10, dim = 512, depth = 32).to(DEVICE)
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(net.parameters(), lr=LEARNING_RATE, 
                             weight_decay=WEIGHT_DECAY)
