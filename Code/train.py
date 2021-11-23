@@ -12,8 +12,8 @@ import random
 
 TRAIN_ID = random.randint(0, 99999)
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-BATCH_SIZE = 128
-LEARNING_RATE = 0.001
+BATCH_SIZE = 256
+LEARNING_RATE = 0.00001
 WEIGHT_DECAY = 0.0001
 NUM_CLASSES=10
 EPOCHS=25
@@ -38,7 +38,7 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
             if i % 100 == 99:
                 print('Epoch {0}: [{1}/{2}] Training Loss: {3:0.3f}'.format(epoch + 1,
                         (i + 1) * BATCH_SIZE, len(train_loader) * BATCH_SIZE,
-                        running_loss / 100), end='\x1b[1K\r')
+                        running_loss / 100), end='\r')
                 running_loss = 0.0
                 
         net.eval()
