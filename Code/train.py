@@ -38,7 +38,7 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
             if i % 100 == 99:
                 print('Epoch {0}: [{1}/{2}] Training Loss: {3:0.3f}'.format(epoch + 1,
                         (i + 1) * BATCH_SIZE, len(train_loader) * BATCH_SIZE,
-                        running_loss / 100), end='\r')
+                        running_loss / 100), end='\r', flush=True)
                 running_loss = 0.0
                 
         net.eval()
