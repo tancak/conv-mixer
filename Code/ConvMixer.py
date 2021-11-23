@@ -17,18 +17,19 @@ class ConvMixerBlock(nn.Module):
         self.conv_depth = nn.Conv2d(dim, dim, kernel_size, groups=dim, padding="same")
         self.conv_point = nn.Conv2d(dim, dim, kernel_size = 1)
         self.gelu = nn.GELU()
-        self.bn = nn.BatchNorm2d(dim)
+        self.bn1 = nn.BatchNorm2d(dim)
+        self.bn2 = nn.BatchNorm2d(dim)
 
     def forward(self, x):
         out = self.conv_depth(x)
         out = self.gelu(out)
-        out = self.bn(out)
+        out = self.bn1(out)
 
         out = out + x # Residual connection
 
         out = self.conv_point(out)
         out = self.gelu(out)
-        out = self.bn(out)
+        out = self.bn2(out)
         return out
 
 class ConvMixer(nn.Module):
