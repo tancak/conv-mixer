@@ -67,7 +67,7 @@ class ConvMixer(nn.Module):
         out = self.fc(out)
         return out
 
-if __name__ == "":
+if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print("Using", device)
 
