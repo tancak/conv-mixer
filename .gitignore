@@ -6,3 +6,4 @@
 .spyproject/config/defaults/defaults-encoding-0.2.0.ini
 .spyproject/config/defaults/defaults-vcs-0.2.0.ini
 .spyproject/config/defaults/defaults-workspace-0.2.0.ini
+Code/data/*
