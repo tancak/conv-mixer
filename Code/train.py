@@ -5,6 +5,7 @@ import torchvision
 import torchvision.transforms as transforms
 from torchvision import datasets
 from ConvMixer import ConvMixer
+from utils import accuracy
 
 import matplotlib.pyplot as plt
 import random
@@ -16,7 +17,7 @@ LEARNING_RATE = 0.001
 WEIGHT_DECAY = 0.0001
 NUM_CLASSES=10
 EPOCHS=25
-LOG_DIR='./train-log-{0:05d}.csv'.format(TRAIN_ID)
+LOG_DIR='./logs/train-log-{0:05d}.csv'.format(TRAIN_ID)
 
 def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
     running_loss = 0.0
@@ -35,10 +36,15 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
     
             running_loss += loss.item()
             if i % 100 == 99:
-                print('Epoch {0}: [{1}/{2}] loss: {3:0.3f}'.format(epoch + 1,
+                print('Epoch {0}: [{1}/{2}] Training Loss: {3:0.3f}'.format(epoch + 1,
                         (i + 1) * BATCH_SIZE, len(train_loader) * BATCH_SIZE,
                         running_loss / 100), end='\r')
                 running_loss = 0.0
+                
+        net.eval()
+        test_loss = accuracy(net, test_loader, loss_function, DEVICE)
+        print('Epoch {0} \t\t Training Loss: {1} \t\t Test Loss:{2}'.format(epoch + 1, running_loss / 100, test_loss))
+        
 
 if __name__ == '__main__':
     print("Params:")
@@ -75,6 +81,6 @@ if __name__ == '__main__':
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=BATCH_SIZE,
                                               shuffle=False, num_workers=2)
     
-    print("Training")
+    print("Starting training")
     
     train(net, loss_function, optimizer, train_loader, test_loader, EPOCHS)
