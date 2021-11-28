@@ -5,22 +5,23 @@ import torchvision
 import torchvision.transforms as transforms
 from torchvision import datasets
 from ConvMixer import ConvMixer
-from utils import accuracy
+from utils import accuracy, validate
 
 import matplotlib.pyplot as plt
 import random
 
 TRAIN_ID = random.randint(0, 99999)
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-BATCH_SIZE = 256
-LEARNING_RATE = 0.00001
+BATCH_SIZE = 1536
+LEARNING_RATE = 0.005
 WEIGHT_DECAY = 0.0001
-NUM_CLASSES=10
-EPOCHS=25
+NUM_CLASSES=100
+EPOCHS=50
 LOG_DIR='./logs/train-log-{0:05d}.csv'.format(TRAIN_ID)
 
 def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
     running_loss = 0.0
+    last_loss = 0.0
     
     for epoch in range(epochs):
         net.train()
@@ -35,15 +36,18 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
             optimizer.step()
     
             running_loss += loss.item()
-            if i % 20 == 19:
-                print('Epoch {0}: [{1}/{2}] Training Loss: {3:0.3f}'.format(epoch + 1,
+            if i % 10 == 9:
+                print('Epoch {0} [{1}/{2}]: Training Loss: {3:0.3f}'.format(epoch + 1,
                         (i + 1) * BATCH_SIZE, len(train_loader) * BATCH_SIZE,
-                        running_loss / 20), end='\r')
+                        running_loss / 10), end='\r')
+                last_loss = running_loss / 10
                 running_loss = 0.0
                 
         net.eval()
-        test_loss = accuracy(net, test_loader, loss_function, DEVICE)
-        print('Epoch {0}          Training Loss: {1:0.3f}          Test Loss:{2:0.3f}'.format(epoch + 1, running_loss / 100, test_loss))
+        test_loss = validate(net, test_loader, loss_function, DEVICE)
+        test_acc = accuracy(net, test_loader, DEVICE)
+        train_acc = accuracy(net, train_loader, DEVICE)
+        print('Epoch {0}\033[K\nTraining Loss: {1:0.3f}          Test Loss: {2:0.3f}          Training Accuracy:{3:0.3f}          Test Accuracy:{4:0.3f}'.format(epoch + 1, last_loss, test_loss, train_acc, test_acc))
         
 
 if __name__ == '__main__':
@@ -59,7 +63,7 @@ if __name__ == '__main__':
                                      LOG_DIR))
     print("Generating model and optimizer")
     
-    net = ConvMixer(10, dim = 512, depth = 32).to(DEVICE)
+    net = ConvMixer(num_classes = 100, dim = 256, depth = 8, kernel_size = 2, patch_size = 2).to(DEVICE)
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(net.parameters(), lr=LEARNING_RATE, 
                             weight_decay=WEIGHT_DECAY)
@@ -67,16 +71,19 @@ if __name__ == '__main__':
     print("Making datasets and dataloaders")
                                                   
     transform = transforms.Compose(
-        [transforms.ToTensor(),
+        [transforms.RandomHorizontalFlip(p=0.5),
+         transforms.RandomVerticalFlip(p=0.5),
+         transforms.RandomRotation(1),
+         transforms.ToTensor(),
          transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
-    train_set = datasets.CIFAR10(root='./data', train=True, download=True, 
+    train_set = datasets.CIFAR100(root='./data', train=True, download=True, 
                                  transform=transform)
     train_loader = torch.utils.data.DataLoader(train_set, 
                                                batch_size=BATCH_SIZE, 
                                                shuffle=True, num_workers=2)
     
-    test_set = datasets.CIFAR10(root='./data', train=False, download=True, 
+    test_set = datasets.CIFAR100(root='./data', train=False, download=True, 
                                 transform=transform)
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=BATCH_SIZE,
                                               shuffle=False, num_workers=2)
