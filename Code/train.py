@@ -4,6 +4,7 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 from torchvision import datasets
+from torch.utils.tensorboard import SummaryWriter
 from ConvMixer import ConvMixer
 from utils import accuracy, validate
 
@@ -20,6 +21,7 @@ EPOCHS=50
 LOG_DIR='./logs/train-log-{0:05d}.csv'.format(TRAIN_ID)
 
 def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
+    tb = SummaryWriter()
     running_loss = 0.0
     last_loss = 0.0
     
@@ -47,8 +49,15 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
         test_loss = validate(net, test_loader, loss_function, DEVICE)
         test_acc = accuracy(net, test_loader, DEVICE)
         train_acc = accuracy(net, train_loader, DEVICE)
-        print('Epoch {0}\033[K\nTraining Loss: {1:0.3f}          Test Loss: {2:0.3f}          Training Accuracy:{3:0.3f}          Test Accuracy:{4:0.3f}'.format(epoch + 1, last_loss, test_loss, train_acc, test_acc))
+
+        tb.add_scalar("Train Loss", last_loss, epoch)
+        tb.add_scalar("Test Loss", test_loss, epoch)
+        tb.add_scalar("Train Accuracy", train_acc, epoch)
+        tb.add_scalar("Test Accuracy", test_acc, epoch)
         
+
+        print('Epoch {0}\033[K\nTraining Loss: {1:0.3f}          Test Loss: {2:0.3f}          Training Accuracy:{3:0.3f}          Test Accuracy:{4:0.3f}'.format(epoch + 1, last_loss, test_loss, train_acc, test_acc))
+    tb.close()
 
 if __name__ == '__main__':
     print("Params:")

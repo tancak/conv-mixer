@@ -13,3 +13,4 @@ Code/data/*
 .spyproject/config/backups/workspace.ini.bak
 Code/__pycache__/ConvMixer.cpython-38.pyc
 Code/__pycache__/utils.cpython-38.pyc
+Code/runs/*
