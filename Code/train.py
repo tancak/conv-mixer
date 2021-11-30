@@ -17,8 +17,7 @@ BATCH_SIZE = 1536
 LEARNING_RATE = 0.005
 WEIGHT_DECAY = 0.0001
 NUM_CLASSES=100
-EPOCHS=50
-LOG_DIR='./logs/train-log-{0:05d}.csv'.format(TRAIN_ID)
+EPOCHS=500
 
 def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
     tb = SummaryWriter()
@@ -57,6 +56,15 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
         
 
         print('Epoch {0}\033[K\nTraining Loss: {1:0.3f}          Test Loss: {2:0.3f}          Training Accuracy:{3:0.3f}          Test Accuracy:{4:0.3f}'.format(epoch + 1, last_loss, test_loss, train_acc, test_acc))
+        torch.save({
+            'epoch': epoch,
+            'model_state_dict': net.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'train_loss': last_loss,
+            'test_loss': test_loss,
+            'train_acc': train_acc,
+            'test_acc': test_acc,
+            }, str(TRAIN_ID)+".pkl")
     tb.close()
 
 if __name__ == '__main__':
@@ -66,13 +74,11 @@ if __name__ == '__main__':
            "  Batch Size: {2}\n"
            "  Learning Rate: {3}\n"
            "  Weight Decay: {4}\n"
-           "  Max Epochs: {5}\n"
-           "  Log Path: {6}").format(TRAIN_ID, DEVICE, BATCH_SIZE,
-                                     LEARNING_RATE, WEIGHT_DECAY, EPOCHS, 
-                                     LOG_DIR))
+           "  Max Epochs: {5}\n").format(TRAIN_ID, DEVICE, BATCH_SIZE,
+                                     LEARNING_RATE, WEIGHT_DECAY, EPOCHS))
     print("Generating model and optimizer")
     
-    net = ConvMixer(num_classes = 100, dim = 256, depth = 8, kernel_size = 2, patch_size = 2).to(DEVICE)
+    net = ConvMixer(num_classes = 100, dim = 512, depth = 20, kernel_size = 4, patch_size = 8).to(DEVICE)
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(net.parameters(), lr=LEARNING_RATE, 
                             weight_decay=WEIGHT_DECAY)
