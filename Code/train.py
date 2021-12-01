@@ -7,14 +7,15 @@ from torchvision import datasets
 from torch.utils.tensorboard import SummaryWriter
 from ConvMixer import ConvMixer
 from utils import accuracy, validate
+from koila import lazy
 
 import matplotlib.pyplot as plt
 import random
 
 TRAIN_ID = random.randint(0, 99999)
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-BATCH_SIZE = 70
-LEARNING_RATE = 0.0005
+BATCH_SIZE = 90
+LEARNING_RATE = 0.001
 WEIGHT_DECAY = 0.001
 NUM_CLASSES=100
 EPOCHS=500
@@ -28,7 +29,7 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
         net.train()
         
         for i, data in enumerate(train_loader, 0):
-            inputs, labels = data[0].to(DEVICE), data[1].to(DEVICE)
+            inputs, labels = lazy(data[0]).to(DEVICE), lazy(data[1]).to(DEVICE)
             
             optimizer.zero_grad()
             outputs = net(inputs)
