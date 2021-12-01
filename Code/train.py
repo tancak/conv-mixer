@@ -13,9 +13,9 @@ import random
 
 TRAIN_ID = random.randint(0, 99999)
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-BATCH_SIZE = 1536
-LEARNING_RATE = 0.005
-WEIGHT_DECAY = 0.0001
+BATCH_SIZE = 70
+LEARNING_RATE = 0.0005
+WEIGHT_DECAY = 0.001
 NUM_CLASSES=100
 EPOCHS=500
 
@@ -37,17 +37,17 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
             optimizer.step()
     
             running_loss += loss.item()
-            if i % 10 == 9:
+            if i % 4 == 3:
                 print('Epoch {0} [{1}/{2}]: Training Loss: {3:0.3f}'.format(epoch + 1,
                         (i + 1) * BATCH_SIZE, len(train_loader) * BATCH_SIZE,
-                        running_loss / 10), end='\r')
-                last_loss = running_loss / 10
+                        running_loss / 4), end='\r')
+                last_loss = running_loss / 4
                 running_loss = 0.0
                 
         net.eval()
         test_loss = validate(net, test_loader, loss_function, DEVICE)
         test_acc = accuracy(net, test_loader, DEVICE)
-        train_acc = accuracy(net, train_loader, DEVICE)
+        train_acc = 0#accuracy(net, train_loader, DEVICE)
 
         tb.add_scalar("Train Loss", last_loss, epoch)
         tb.add_scalar("Test Loss", test_loss, epoch)
@@ -64,7 +64,7 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
             'test_loss': test_loss,
             'train_acc': train_acc,
             'test_acc': test_acc,
-            }, str(TRAIN_ID)+".pkl")
+            }, str(TRAIN_ID)+ "-" + str(epoch) +".pkl")
     tb.close()
 
 if __name__ == '__main__':
@@ -78,28 +78,32 @@ if __name__ == '__main__':
                                      LEARNING_RATE, WEIGHT_DECAY, EPOCHS))
     print("Generating model and optimizer")
     
-    net = ConvMixer(num_classes = 100, dim = 512, depth = 20, kernel_size = 4, patch_size = 8).to(DEVICE)
+    net = ConvMixer(num_classes = 100, dim = 512, depth = 20, kernel_size = 7, patch_size = 1).to(DEVICE)
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(net.parameters(), lr=LEARNING_RATE, 
                             weight_decay=WEIGHT_DECAY)
     
     print("Making datasets and dataloaders")
                                                   
-    transform = transforms.Compose(
+    transform_train = transforms.Compose(
         [transforms.RandomHorizontalFlip(p=0.5),
          transforms.RandomVerticalFlip(p=0.5),
          transforms.RandomRotation(1),
          transforms.ToTensor(),
          transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+
+    transform_test = transforms.Compose(
+        [transforms.ToTensor(),
+         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
     
     train_set = datasets.CIFAR100(root='./data', train=True, download=True, 
-                                 transform=transform)
+                                 transform=transform_train)
     train_loader = torch.utils.data.DataLoader(train_set, 
                                                batch_size=BATCH_SIZE, 
                                                shuffle=True, num_workers=2)
     
     test_set = datasets.CIFAR100(root='./data', train=False, download=True, 
-                                transform=transform)
+                                transform=transform_test)
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=BATCH_SIZE,
                                               shuffle=False, num_workers=2)
     
