@@ -24,7 +24,6 @@ KERNEL_SIZE = 7
 PATCH_SIZE = 1
 
 def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
-    tb = SummaryWriter()
     running_loss = 0.0
     last_loss = 0.0
     
@@ -53,10 +52,11 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
         test_acc = accuracy(net, test_loader, DEVICE)
         train_acc = 0#accuracy(net, train_loader, DEVICE)
 
-        tb.add_scalar("Train Loss", last_loss, epoch)
-        tb.add_scalar("Test Loss", test_loss, epoch)
-        tb.add_scalar("Train Accuracy", train_acc, epoch)
-        tb.add_scalar("Test Accuracy", test_acc, epoch)
+        wandb.log("Train Loss", last_loss)
+        wandb.log("Test Loss", test_loss)
+        wandb.log("Train Accuracy", train_acc)
+        wandb.log("Test Accuracy", test_acc)
+        wandb.watch(net)
         
 
         print('Epoch {0}\033[K\nTraining Loss: {1:0.3f}          Test Loss: {2:0.3f}          Training Accuracy:{3:0.3f}          Test Accuracy:{4:0.3f}'.format(epoch + 1, last_loss, test_loss, train_acc, test_acc))
@@ -69,7 +69,6 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
             'train_acc': train_acc,
             'test_acc': test_acc,
             }, str(TRAIN_ID)+ "-" + str(epoch) +".pkl")
-    tb.close()
 
 if __name__ == '__main__':
     print("Params:")
