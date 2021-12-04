@@ -80,6 +80,11 @@ if __name__ == '__main__':
     print("Generating model and optimizer")
     
     net = ConvMixer(num_classes = 100, dim = 512, depth = 20, kernel_size = 7, patch_size = 1).to(DEVICE)
+
+    if DEVICE == 'cuda':
+        if torch.cuda.device_count() > 1:
+            net = nn.DataParallel(net)
+
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(net.parameters(), lr=LEARNING_RATE, 
                             weight_decay=WEIGHT_DECAY)
