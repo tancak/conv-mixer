@@ -52,10 +52,12 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
         test_acc = accuracy(net, test_loader, DEVICE)
         train_acc = 0#accuracy(net, train_loader, DEVICE)
 
-        wandb.log("Train Loss", last_loss)
-        wandb.log("Test Loss", test_loss)
-        wandb.log("Train Accuracy", train_acc)
-        wandb.log("Test Accuracy", test_acc)
+        wandb.log({
+            "Train Loss": last_loss,
+            "Test Loss": test_loss,
+            "Train Accuracy": train_acc,
+            "Test Accuracy": test_acc})
+            
         wandb.watch(net)
         
 
