@@ -1,0 +1,13 @@
+Params:
+  Training ID: 75432
+  Device: cuda
+  Batch Size: 80
+  Learning Rate: 0.001
+  Weight Decay: 0.001
+  Max Epochs: 500
+
+Generating model and optimizer
+Making datasets and dataloaders
+Files already downloaded and verified
+Files already downloaded and verified
+Starting training

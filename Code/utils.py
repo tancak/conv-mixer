@@ -1,11 +1,11 @@
 import torch
-from koila import LazyTensor, lazy
+#from koila import LazyTensor, lazy
 
 def validate(model, test_loader, loss_function, device):
     test_loss = []
     with torch.no_grad():
         for data in test_loader:
-            inputs, labels = lazy(data[0]).to(device), lazy(data[1]).to(device)
+            inputs, labels = data[0].to(device), data[1].to(device)
             outputs = model(inputs)
             loss = loss_function(outputs,labels)
             test_loss.append(loss.item())
@@ -18,7 +18,7 @@ def accuracy(model, dataloader, device):
 
     with torch.no_grad():
         for data in dataloader:
-            inputs, labels = lazy(data[0]).to(device), lazy(data[1]).to(device)
+            inputs, labels = data[0].to(device), data[1].to(device)
             outputs = model(inputs)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
