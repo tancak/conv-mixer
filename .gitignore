@@ -15,3 +15,5 @@ Code/__pycache__/ConvMixer.cpython-38.pyc
 Code/__pycache__/utils.cpython-38.pyc
 Code/runs/*
 *.pkl
+*.err
+*.out
