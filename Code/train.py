@@ -4,10 +4,9 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 from torchvision import datasets
-from torch.utils.tensorboard import SummaryWriter
 from ConvMixer import ConvMixer
 from utils import accuracy, validate
-#from koila import lazy
+import wandb
 
 import matplotlib.pyplot as plt
 import random
@@ -17,8 +16,12 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 80
 LEARNING_RATE = 0.001
 WEIGHT_DECAY = 0.001
-NUM_CLASSES=100
-EPOCHS=500
+NUM_CLASSES =100
+EPOCHS = 25
+DEPTH = 20
+DIM = 512
+KERNEL_SIZE = 7
+PATCH_SIZE = 1
 
 def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
     tb = SummaryWriter()
@@ -79,7 +82,7 @@ if __name__ == '__main__':
                                      LEARNING_RATE, WEIGHT_DECAY, EPOCHS))
     print("Generating model and optimizer")
     
-    net = ConvMixer(num_classes = 100, dim = 512, depth = 20, kernel_size = 7, patch_size = 1).to(DEVICE)
+    net = ConvMixer(num_classes = 100, dim = DIM, depth = DEPTH, kernel_size = KERNEL_SIZE, patch_size = PATCH_SIZE).to(DEVICE)
 
     if DEVICE == 'cuda':
         if torch.cuda.device_count() > 1:
@@ -115,4 +118,15 @@ if __name__ == '__main__':
     
     print("Starting training")
     
+    wandb.init(project="conv-mixer", entity="tancak")
+    wandb.config = {
+        "learning_rate": LEARNING_RATE,
+        "weight_decay": WEIGHT_DECAY,
+        "depth": DEPTH,
+        "dim": DIM,
+        "kernel_size": KERNEL_SIZE,
+        "patch_size": PATCH_SIZE,
+        "epochs": EPOCHS,
+        "batch_size": BATCH_SIZE,
+    }
     train(net, loss_function, optimizer, train_loader, test_loader, EPOCHS)

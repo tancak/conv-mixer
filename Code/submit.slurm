@@ -2,7 +2,7 @@
 #SBATCH -n 1 # Number of cores, pero no funciona
 #SBATCH -N 1 # Ensure that all cores are on one machine
 #SBATCH -D /home/mtancak/conv-mixer/Code # working directory
-#SBATCH -t 0-00:05 # Runtime in D-HH:MM
+#SBATCH -t 1-00:00 # Runtime in D-HH:MM
 #SBATCH -p high # Partition to submit to
 #SBATCH --mem 19200 # MB solicitados
 #SBATCH --gres gpu:2 # GPU's solicitadas gpu: o gpu:TitanXp: o gpu:1080Ti:
