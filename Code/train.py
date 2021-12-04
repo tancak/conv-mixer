@@ -57,7 +57,7 @@ def train(net, loss_function, optimizer, train_loader, test_loader, epochs):
             "Test Loss": test_loss,
             "Train Accuracy": train_acc,
             "Test Accuracy": test_acc})
-            
+
         wandb.watch(net)
         
 
@@ -119,7 +119,6 @@ if __name__ == '__main__':
     
     print("Starting training")
     
-    wandb.init(project="conv-mixer", entity="tancak")
     wandb.config = {
         "learning_rate": LEARNING_RATE,
         "weight_decay": WEIGHT_DECAY,
@@ -130,4 +129,6 @@ if __name__ == '__main__':
         "epochs": EPOCHS,
         "batch_size": BATCH_SIZE,
     }
+    wandb.init(project="conv-mixer", entity="tancak")
+   
     train(net, loss_function, optimizer, train_loader, test_loader, EPOCHS)
